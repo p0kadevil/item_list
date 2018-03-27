@@ -6,24 +6,104 @@
 //  Copyright © 2018 Privat. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "ItemListViewController.h"
 
-@interface ViewController ()
+@interface ItemListViewController ()
+
+@property (nonatomic, strong) NSMutableArray *items;
 
 @end
 
-@implementation ViewController
+@implementation ItemListViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    
+    self.items = [DBManager getItems];
+    
+    if(self.items.count <= 0)
+    {
+        [self fetchItemsFromNetworkAndPersist];
+    }
+    else
+    {
+        [self.itemTableView reloadData];
+    }
 }
 
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void) fetchItemsFromNetworkAndPersist
+{
+    [self showActivity];
+    
+    __weak ItemListViewController *weakSelf = self;
+    [RestManager getItemListWithSuccess:^(NSDictionary *result){
+        
+        [weakSelf hideActivty];
+        
+        if(result)
+        {
+            for(NSDictionary *item in result[@"items"])
+            {
+                [weakSelf.items addObject:item];
+                [DBManager insertItem:item];
+            }
+            
+            [weakSelf.itemTableView reloadData];
+        }
+        
+    } andFailure:^(NSError *error){
+        
+        [weakSelf hideActivty];
+    }];
 }
+
+- (void) showActivity
+{
+    self.activityView.hidden = NO;
+    [self.activityIndicator startAnimating];
+}
+
+- (void) hideActivty
+{
+    self.activityView.hidden = YES;
+    [self.activityIndicator stopAnimating];
+}
+
+- (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView
+                 cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
+    
+    ItemTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"item_reuse_id"];
+    
+    NSString *itemName = self.items[indexPath.row][@"name"];
+    int itemNumber = [self.items[indexPath.row][@"no"] intValue];
+    double price = [self.items[indexPath.row][@"price"] doubleValue];
+    NSString *expires = self.items[indexPath.row][@"expires"];
+    
+    cell.nameLabel.text = [NSString stringWithFormat:@"%@ (No. %i)", itemName, itemNumber];
+    cell.dateLabel.text = expires;
+    cell.priceLabel.text = [NSString stringWithFormat:@"%.02f €", price];
+    
+    return cell;
+}
+
+- (NSInteger)tableView:(nonnull UITableView *)tableView
+ numberOfRowsInSection:(NSInteger)section {
+    return self.items.count;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView
+heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return UITableViewAutomaticDimension;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView
+estimatedHeightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
+{
+    return UITableViewAutomaticDimension;
+}
+
 
 
 @end

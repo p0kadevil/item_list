@@ -9,5 +9,6 @@
 #ifndef Constants_h
 #define Constants_h
 
+#define kItemListUrl @"http://pastebin.com/raw/U8B5EKUd"
 
 #endif /* Constants_h */

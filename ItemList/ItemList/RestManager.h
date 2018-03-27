@@ -7,7 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "AFURLSessionManager.h"
+#import "Constants.h"
 
 @interface RestManager : NSObject
+
++ (void) getItemListWithSuccess:(void(^) (NSDictionary * successDict)) successBlock
+                     andFailure:(void(^) (NSError * failureDict)) failureBlock;
 
 @end

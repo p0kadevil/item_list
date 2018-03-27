@@ -7,9 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "RestManager.h"
+#import "DBManager.h"
+#import "ItemTableViewCell.h"
 
-@interface ViewController : UIViewController
+@interface ItemListViewController : UIViewController<UITableViewDelegate, UITableViewDataSource>
 
+@property (weak, nonatomic) IBOutlet UITableView *itemTableView;
+@property (weak, nonatomic) IBOutlet UIView *activityView;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 
 @end
 
