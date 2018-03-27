@@ -7,12 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
 
 @interface DBManager : NSObject
 
-+ (bool) insertItem:(NSDictionary *)itemDict;
-+ (NSMutableArray *) getItems;
++ (bool) insertItem:(NSDictionary *)itemDict
+        withContext:(NSManagedObjectContext *)context;
++ (NSMutableArray *) getItemsWithContext:(NSManagedObjectContext *)context;
 
 @end

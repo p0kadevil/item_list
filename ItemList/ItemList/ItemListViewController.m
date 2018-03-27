@@ -7,6 +7,7 @@
 //
 
 #import "ItemListViewController.h"
+#import "AppDelegate.h"
 
 @interface ItemListViewController ()
 
@@ -20,7 +21,7 @@
 {
     [super viewDidLoad];
     
-    self.items = [DBManager getItems];
+    self.items = [DBManager getItemsWithContext:[self getContext]];
     
     if(self.items.count <= 0)
     {
@@ -46,7 +47,7 @@
             for(NSDictionary *item in result[@"items"])
             {
                 [weakSelf.items addObject:item];
-                [DBManager insertItem:item];
+                [DBManager insertItem:item withContext:[self getContext]];
             }
             
             [weakSelf.itemTableView reloadData];
@@ -104,6 +105,10 @@ estimatedHeightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
     return UITableViewAutomaticDimension;
 }
 
-
+- (NSManagedObjectContext *) getContext
+{
+    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    return appDelegate.persistentContainer.viewContext;
+}
 
 @end
